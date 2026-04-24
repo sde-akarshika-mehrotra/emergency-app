@@ -1,28 +1,26 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'screens/home_screen.dart';
 
-// 🔥 MIC PERMISSION FUNCTION
+// 🔥 Mic permission (only for mobile)
 Future<void> requestMicPermission() async {
-  var status = await Permission.microphone.request();
-
-  if (!status.isGranted) {
-    print("❌ Mic permission denied");
-  } else {
-    print("✅ Mic permission granted");
-  }
+  // For MVP, skip actual permission logic
+  print("Mic permission works only on mobile");
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: ".env"); 
+  // ✅ Load env safely
+  await dotenv.load(fileName: ".env");
 
-  await Firebase.initializeApp();
-
-  await requestMicPermission();
+  // ✅ Only initialize Firebase on mobile
+  if (!kIsWeb) {
+    await Firebase.initializeApp();
+    await requestMicPermission();
+  }
 
   runApp(const EmergencyApp());
 }

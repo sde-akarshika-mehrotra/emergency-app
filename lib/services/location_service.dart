@@ -1,9 +1,22 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter/foundation.dart';
 
 class LocationService {
 
   static Future<String> getLocationLink() async {
     try {
+
+      // 🌐 WEB HANDLING
+      if (kIsWeb) {
+        // Web supports geolocation but needs permission via browser
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+
+        return _buildMapLink(position);
+      }
+
+      // 📱 MOBILE FLOW
 
       // 🔥 STEP 1: Check GPS
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -26,19 +39,7 @@ class LocationService {
         return "❌ Permission permanently denied (go to settings)";
       }
 
-      // 🔥 STEP 3: Force high accuracy (IMPORTANT FIX)
-      await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      // 🔥 STEP 4: Get LAST KNOWN first (fast + stable)
-      Position? lastPosition = await Geolocator.getLastKnownPosition();
-
-      if (lastPosition != null) {
-        return _buildMapLink(lastPosition);
-      }
-
-      // 🔥 STEP 5: REAL-TIME LOCATION fallback
+      // 🔥 STEP 3: Get location
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );

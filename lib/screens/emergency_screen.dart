@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'; // ✅ IMPORTANT
 import '../services/call_service.dart';
 
 class EmergencyScreen extends StatelessWidget {
@@ -6,6 +7,16 @@ class EmergencyScreen extends StatelessWidget {
 
   void makeSafeCall(BuildContext context, String number) async {
     try {
+      if (kIsWeb) {
+        // ❌ Web cannot make calls
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Calling feature available in mobile app 📱"),
+          ),
+        );
+        return;
+      }
+
       await CallService.makeCall(number);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -59,7 +70,7 @@ class EmergencyScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // 🔙 Back Button (important UX)
+          // 🔙 Back Button
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
             onPressed: () {

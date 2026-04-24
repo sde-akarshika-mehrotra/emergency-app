@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'; // ✅ optional
 import '../services/emergency_controller.dart';
 
 class EmergencyAlertScreen extends StatefulWidget {
@@ -18,8 +19,8 @@ class _EmergencyAlertScreenState extends State<EmergencyAlertScreen> {
   void initState() {
     super.initState();
 
-    // 🔴 FLASH EFFECT
-    flashTimer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+    // 🔴 FLASH EFFECT (slightly smoother)
+    flashTimer = Timer.periodic(const Duration(milliseconds: 600), (_) {
       if (mounted) {
         setState(() {
           visible = !visible;
@@ -27,7 +28,7 @@ class _EmergencyAlertScreenState extends State<EmergencyAlertScreen> {
       }
     });
 
-    // 🔁 AUTO REFRESH AI MESSAGE (IMPORTANT FIX)
+    // 🔁 AUTO REFRESH AI MESSAGE
     refreshTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) {
         setState(() {});
@@ -46,7 +47,9 @@ class _EmergencyAlertScreenState extends State<EmergencyAlertScreen> {
   Widget build(BuildContext context) {
     final message =
         EmergencyController.aiMessage ??
-        "🚨 Stay calm...\nSending alert...";
+        (kIsWeb
+            ? "🚨 Demo mode active\nFeatures limited on web"
+            : "🚨 Stay calm...\nSending alert...");
 
     return Scaffold(
       backgroundColor: visible ? Colors.red : Colors.black,
@@ -88,7 +91,6 @@ class _EmergencyAlertScreenState extends State<EmergencyAlertScreen> {
 
             const SizedBox(height: 30),
 
-            // 🔙 EXIT BUTTON
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,

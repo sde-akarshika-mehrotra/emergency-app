@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'; // ✅ IMPORTANT
 import '../widgets/panic_button.dart';
 import '../services/voice_service.dart';
 import '../services/emergency_controller.dart';
@@ -6,7 +7,7 @@ import 'emergency_screen.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key}); // ❌ const हटाया
+  HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -21,21 +22,32 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    // 🔥 SAFE START
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      initVoice();
-    });
+    // ✅ ONLY run voice on mobile
+    if (!kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        initVoice();
+      });
+    }
   }
 
   Future<void> initVoice() async {
-    await voiceService.initialize(); // ✅ new simple init
+    if (kIsWeb) return; // ❌ safety
+
+    await voiceService.initialize();
 
     if (isVoiceActive) {
-      voiceService.startListening(context); // ✅ continuous listening
+      voiceService.startListening(context);
     }
   }
 
   void toggleVoice() {
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Voice feature available on mobile")),
+      );
+      return;
+    }
+
     setState(() {
       isVoiceActive = !isVoiceActive;
     });
@@ -49,7 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    voiceService.stop();
+    if (!kIsWeb) {
+      voiceService.stop();
+    }
     super.dispose();
   }
 
@@ -59,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.red.shade50,
 
       appBar: AppBar(
-        title: Text("Emergency Assistant"), // ❌ const हटाया
+        title: const Text("Emergency Assistant"),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
@@ -73,40 +87,42 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-          Text(
+          const Text(
             "Stay Safe 🚨",
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
 
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
 
           // 🤖 AI MESSAGE
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(color: Colors.black12, blurRadius: 10),
                 ],
               ),
               child: Text(
                 EmergencyController.aiMessage ??
-                    "🎤 Listening... Say 'HELP'",
+                    (kIsWeb
+                        ? "Voice not supported on web"
+                        : "🎤 Listening... Say 'HELP'"),
                 textAlign: TextAlign.center,
               ),
             ),
           ),
 
-          SizedBox(height: 25),
+          const SizedBox(height: 25),
 
           PanicButton(),
 
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -119,11 +135,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => EmergencyScreen(), // ❌ const हटाया
+                      builder: (_) => EmergencyScreen(),
                     ),
                   );
                 },
-                child: Text("Emergency"),
+                child: const Text("Emergency"),
               ),
 
               ElevatedButton(
@@ -134,11 +150,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => SettingsScreen(), // ❌ const हटाया
+                      builder: (_) => SettingsScreen(),
                     ),
                   );
                 },
-                child: Text("Settings"),
+                child: const Text("Settings"),
               ),
             ],
           ),

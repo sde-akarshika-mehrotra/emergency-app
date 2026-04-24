@@ -1,4 +1,5 @@
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart';
 
 class SmsService {
 
@@ -12,10 +13,25 @@ class SmsService {
       },
     );
 
-    if (await canLaunchUrl(smsUri)) {
-      await launchUrl(smsUri);
-    } else {
-      print("Could not launch SMS");
+    try {
+      if (kIsWeb) {
+        // ❌ SMS not supported on web
+        print("SMS feature not supported on web");
+        return;
+      }
+
+      // ✅ Mobile
+      if (await canLaunchUrl(smsUri)) {
+        await launchUrl(
+          smsUri,
+          mode: LaunchMode.externalApplication,
+        );
+      } else {
+        print("❌ Could not launch SMS");
+      }
+
+    } catch (e) {
+      print("❌ SMS error: $e");
     }
   }
 }
