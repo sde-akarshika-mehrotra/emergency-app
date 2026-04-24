@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+
 import 'ai_service.dart';
 import 'location_service.dart';
 import '../screens/emergency_alert_screen.dart';
@@ -14,20 +16,26 @@ class EmergencyController {
     print("🔥 TRIGGER EMERGENCY CALLED");
 
     try {
-      // 🔥 STEP 1: INSTANT UI
-      aiMessage = "🚨 Stay calm...\nSending alert & sharing location...";
+      aiMessage = "🚨 Stay calm...\nProcessing emergency...";
 
       if (!context.mounted) return;
 
-      // ✅ WAIT for screen open (IMPORTANT FIX)
-      await Navigator.of(context).push(
+      // ✅ SAFE NAVIGATION FIRST
+      Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => const EmergencyAlertScreen(),
         ),
       );
 
-      // 🔥 STEP 2: BACKGROUND WORK
-      _runEmergencyTasks();
+      // ❌ WEB SAFETY CHECK
+      if (kIsWeb) {
+        aiMessage = "🚨 Demo mode active (web)\nSome features disabled";
+        print("Web mode: skipping emergency services");
+        return;
+      }
+
+      // 🔥 RUN MOBILE TASKS ONLY
+      await _runEmergencyTasks();
 
     } catch (e) {
       print("ERROR: $e");
@@ -40,28 +48,24 @@ class EmergencyController {
     }
   }
 
-  // 🔥 BACKGROUND TASKS (SEPARATE FUNCTION)
+  // 🔥 MOBILE ONLY TASKS
   static Future<void> _runEmergencyTasks() async {
     try {
-      // 📍 LOCATION
       final location = await LocationService.getLocationLink();
       lastLocation = location;
 
-      // 🤖 AI RESPONSE
       final aiResponse = await AIService.getHelpResponse(
         "User is in danger. Give short emergency steps.",
       );
 
       aiMessage = aiResponse.isNotEmpty
           ? aiResponse
-          : "🚨 Alert sent successfully\n📍 Location shared\n🆘 Help is on the way";
+          : "🚨 Alert sent\n📍 Location shared";
 
       String message = "🚨 HELP! I am in danger.\nLocation: $location";
 
-      // 📩 SMS
-      for (String number in ["9451353833", "9936320468"]) {
-        await SmsService.sendSMS(message, number);
-      }
+      // 📩 SMS (mobile only)
+      await SmsService.sendSMS(message, "9451353833");
 
       // 💬 WhatsApp
       await WhatsAppService.sendWhatsApp(message, "9451353833");
