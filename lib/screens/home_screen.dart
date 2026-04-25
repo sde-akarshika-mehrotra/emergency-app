@@ -130,6 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
+                  foregroundColor: Colors.white, // ✅ text color
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -145,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey,
+                  foregroundColor: Colors.white, // ✅ text color
                 ),
                 onPressed: () {
                   Navigator.push(
