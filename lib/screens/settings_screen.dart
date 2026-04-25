@@ -10,13 +10,10 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Settings")),
-
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-
-            // 📞 INPUT FIELD
             TextField(
               controller: contactController,
               decoration: const InputDecoration(
@@ -25,10 +22,7 @@ class SettingsScreen extends StatelessWidget {
               ),
               keyboardType: TextInputType.phone,
             ),
-
             const SizedBox(height: 20),
-
-            // 💾 SAVE BUTTON
             ElevatedButton(
               onPressed: () async {
                 String number = contactController.text.trim();
@@ -61,10 +55,7 @@ class SettingsScreen extends StatelessWidget {
               },
               child: const Text("Save"),
             ),
-
             const SizedBox(height: 20),
-
-            // 🔥 TITLE
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -75,62 +66,13 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 10),
-
-            // 📋 CONTACT LIST (FIXED)
             Expanded(
-              child: StreamBuilder(
-                stream: DatabaseService.getContacts(),
-                builder: (context, snapshot) {
-
-                  // 🔴 ERROR HANDLE (MOST IMPORTANT FIX)
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text("Error: ${snapshot.error}"),
-                    );
-                  }
-
-                  // ⏳ LOADING
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-
-                  // ❌ NO DATA
-                  if (!snapshot.hasData || snapshot.data == null) {
-                    return const Center(
-                      child: Text("No data found"),
-                    );
-                  }
-
-                  var docs = snapshot.data!.docs;
-
-                  if (docs.isEmpty) {
-                    return const Center(
-                      child: Text("No contacts added yet"),
-                    );
-                  }
-
-                  // ✅ SHOW DATA
-                  return ListView.builder(
-                    itemCount: docs.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        child: ListTile(
-                          leading: const Icon(
-                            Icons.phone,
-                            color: Colors.red,
-                          ),
-                          title: Text(
-                            docs[index]['number'] ?? "No Number",
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
+              child: Center(
+                child: Text(
+                  "SETTINGS WORKING ✅",
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
             ),
           ],
