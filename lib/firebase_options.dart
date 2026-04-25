@@ -50,7 +50,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDR_w-Z0rL4jtRKwp7hQgx9AGBMRVgvJ2w',
+    apiKey: 'AIzaSyDa02tBiZcAxsksxatnQaayQ-R9yeT2KOc',
     appId: '1:953488678329:web:058c1d4534287be391aa68',
     messagingSenderId: '953488678329',
     projectId: 'emergency-app-akarshika',
@@ -59,7 +59,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDR_w-Z0rL4jtRKwp7hQgx9AGBMRVgvJ2w',
+    apiKey: 'AIzaSyDa02tBiZcAxsksxatnQaayQ-R9yeT2KOc',
     appId: '1:953488678329:android:7c3bbf417c70121891aa68',
     messagingSenderId: '953488678329',
     projectId: 'emergency-app-akarshika',
