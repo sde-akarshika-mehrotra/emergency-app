@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart'; 
+import 'package:flutter/foundation.dart';
 import '../widgets/panic_button.dart';
 import '../services/voice_service.dart';
 import '../services/emergency_controller.dart';
@@ -22,7 +22,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    // ✅ ONLY run voice on mobile
     if (!kIsWeb) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         initVoice();
@@ -31,12 +30,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> initVoice() async {
-    if (kIsWeb) return; // ❌ safety
+    if (kIsWeb) return;
 
-    await voiceService.initialize();
+    try {
+      await voiceService.initialize();
 
-    if (isVoiceActive) {
-      voiceService.startListening(context);
+      if (isVoiceActive) {
+        voiceService.startListening(context);
+      }
+    } catch (e) {
+      print("Voice error: $e");
     }
   }
 
@@ -71,7 +74,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.red.shade50,
-
       appBar: AppBar(
         title: const Text("Emergency Assistant"),
         centerTitle: true,
@@ -83,20 +85,15 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
-
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: 20),
-
           const Text(
             "Stay Safe 🚨",
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
-
           const SizedBox(height: 20),
-
-          // 🤖 AI MESSAGE
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Container(
@@ -117,20 +114,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-
           const SizedBox(height: 25),
-
           PanicButton(),
-
           const SizedBox(height: 30),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
-                  foregroundColor: Colors.white, // ✅ text color
+                  foregroundColor: Colors.white,
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -142,11 +135,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 child: const Text("Emergency"),
               ),
-
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey,
-                  foregroundColor: Colors.white, // ✅ text color
+                  foregroundColor: Colors.white,
                 ),
                 onPressed: () {
                   Navigator.push(
