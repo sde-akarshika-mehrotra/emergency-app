@@ -14,7 +14,6 @@ class SettingsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // 📞 INPUT FIELD
             TextField(
               controller: contactController,
               decoration: const InputDecoration(
@@ -62,7 +61,6 @@ class SettingsScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 🔥 TITLE
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -76,6 +74,7 @@ class SettingsScreen extends StatelessWidget {
 
             const SizedBox(height: 10),
 
+            // 📋 SAFE STREAM BUILDER
             Expanded(
               child: StreamBuilder(
                 stream: DatabaseService.getContacts(),
@@ -92,7 +91,6 @@ class SettingsScreen extends StatelessWidget {
                     );
                   }
 
-                  // ❌ NO DATA
                   if (!snapshot.hasData || snapshot.data == null) {
                     return const Center(
                       child: Text("No data found"),
@@ -110,11 +108,15 @@ class SettingsScreen extends StatelessWidget {
                   return ListView.builder(
                     itemCount: docs.length,
                     itemBuilder: (context, index) {
-                      var data = docs[index].data() as Map<String, dynamic>;
+                      var data = docs[index].data();
 
-                      String number = data.containsKey('number')
-                          ? data['number'].toString()
-                          : "No Number";
+                      String number = "No Number";
+
+                      if (data is Map) {
+                        if (data.containsKey('number')) {
+                          number = data['number'].toString();
+                        }
+                      }
 
                       return Card(
                         child: ListTile(
