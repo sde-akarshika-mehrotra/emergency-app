@@ -2,23 +2,26 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'firebase_options.dart'; 
 import 'screens/home_screen.dart';
 
 // 🔥 Mic permission (only for mobile)
 Future<void> requestMicPermission() async {
-  // For MVP, skip actual permission logic
-  print("Mic permission works only on mobile");
+  if (!kIsWeb) {
+    print("Mic permission works only on mobile");
+  }
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ Load env safely
+  // ✅ Load env
   await dotenv.load(fileName: ".env");
 
-  // ✅ Only initialize Firebase on mobile
+ await Firebase.initializeApp();
+
+  // 🔥 Only run mic permission on mobile
   if (!kIsWeb) {
-    await Firebase.initializeApp();
     await requestMicPermission();
   }
 
