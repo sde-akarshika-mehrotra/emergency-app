@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'firebase_options.dart';
 import 'screens/home_screen.dart';
 
-
 Future<void> requestMicPermission() async {
   if (!kIsWeb) {
     print("Mic permission works only on mobile");
@@ -15,10 +14,11 @@ Future<void> requestMicPermission() async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ Load env
   await dotenv.load(fileName: ".env");
 
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   if (!kIsWeb) {
     await requestMicPermission();
