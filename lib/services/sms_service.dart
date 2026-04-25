@@ -2,9 +2,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
 
 class SmsService {
-
   static Future<void> sendSMS(String message, String number) async {
-
     final Uri smsUri = Uri(
       scheme: 'sms',
       path: number,
@@ -15,12 +13,10 @@ class SmsService {
 
     try {
       if (kIsWeb) {
-        // ❌ SMS not supported on web
         print("SMS feature not supported on web");
         return;
       }
 
-      // ✅ Mobile
       if (await canLaunchUrl(smsUri)) {
         await launchUrl(
           smsUri,
@@ -29,7 +25,6 @@ class SmsService {
       } else {
         print("❌ Could not launch SMS");
       }
-
     } catch (e) {
       print("❌ SMS error: $e");
     }

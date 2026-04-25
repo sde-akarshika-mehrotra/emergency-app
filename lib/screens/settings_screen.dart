@@ -10,10 +10,12 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Settings")),
+
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+
             // 📞 INPUT FIELD
             TextField(
               controller: contactController,
@@ -32,18 +34,28 @@ class SettingsScreen extends StatelessWidget {
                 String number = contactController.text.trim();
 
                 if (number.isNotEmpty) {
-                  await DatabaseService.saveContact(number);
+                  try {
+                    await DatabaseService.saveContact(number);
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text("✅ Contact Saved to Database")),
-                  );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("✅ Contact Saved"),
+                      ),
+                    );
 
-                  contactController.clear();
+                    contactController.clear();
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("❌ Error: $e"),
+                      ),
+                    );
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text("❌ Please enter a number")),
+                      content: Text("❌ Please enter a number"),
+                    ),
                   );
                 }
               },
@@ -66,34 +78,54 @@ class SettingsScreen extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            // 📋 CONTACT LIST (IMPORTANT FIX)
+            // 📋 CONTACT LIST (FIXED)
             Expanded(
               child: StreamBuilder(
                 stream: DatabaseService.getContacts(),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Center(
-                        child: CircularProgressIndicator());
+
+                  // 🔴 ERROR HANDLE (MOST IMPORTANT FIX)
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text("Error: ${snapshot.error}"),
+                    );
                   }
 
-                  if (!snapshot.hasData ||
-                      snapshot.data!.docs.isEmpty) {
+                  // ⏳ LOADING
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
-                      child: Text("No contacts added yet"),
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  // ❌ NO DATA
+                  if (!snapshot.hasData || snapshot.data == null) {
+                    return const Center(
+                      child: Text("No data found"),
                     );
                   }
 
                   var docs = snapshot.data!.docs;
 
+                  if (docs.isEmpty) {
+                    return const Center(
+                      child: Text("No contacts added yet"),
+                    );
+                  }
+
+                  // ✅ SHOW DATA
                   return ListView.builder(
                     itemCount: docs.length,
                     itemBuilder: (context, index) {
                       return Card(
                         child: ListTile(
-                          leading:
-                              const Icon(Icons.phone, color: Colors.red),
-                          title: Text(docs[index]['number']),
+                          leading: const Icon(
+                            Icons.phone,
+                            color: Colors.red,
+                          ),
+                          title: Text(
+                            docs[index]['number'] ?? "No Number",
+                          ),
                         ),
                       );
                     },
