@@ -14,6 +14,7 @@ class SettingsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+            // 📞 INPUT FIELD
             TextField(
               controller: contactController,
               decoration: const InputDecoration(
@@ -22,7 +23,10 @@ class SettingsScreen extends StatelessWidget {
               ),
               keyboardType: TextInputType.phone,
             ),
+
             const SizedBox(height: 20),
+
+            // 💾 SAVE BUTTON
             ElevatedButton(
               onPressed: () async {
                 String number = contactController.text.trim();
@@ -55,7 +59,10 @@ class SettingsScreen extends StatelessWidget {
               },
               child: const Text("Save"),
             ),
+
             const SizedBox(height: 20),
+
+            // 🔥 TITLE
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -66,13 +73,61 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
             ),
+
             const SizedBox(height: 10),
+
             Expanded(
-              child: Center(
-                child: Text(
-                  "SETTINGS WORKING ✅",
-                  style: TextStyle(fontSize: 20),
-                ),
+              child: StreamBuilder(
+                stream: DatabaseService.getContacts(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text("Error: ${snapshot.error}"),
+                    );
+                  }
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  // ❌ NO DATA
+                  if (!snapshot.hasData || snapshot.data == null) {
+                    return const Center(
+                      child: Text("No data found"),
+                    );
+                  }
+
+                  var docs = snapshot.data!.docs;
+
+                  if (docs.isEmpty) {
+                    return const Center(
+                      child: Text("No contacts added yet"),
+                    );
+                  }
+
+                  return ListView.builder(
+                    itemCount: docs.length,
+                    itemBuilder: (context, index) {
+                      var data = docs[index].data() as Map<String, dynamic>;
+
+                      String number = data.containsKey('number')
+                          ? data['number'].toString()
+                          : "No Number";
+
+                      return Card(
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.phone,
+                            color: Colors.red,
+                          ),
+                          title: Text(number),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],
